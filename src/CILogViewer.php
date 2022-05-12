@@ -42,7 +42,7 @@ class CILogViewer {
      *
      * @var string
      */
-    private $viewName = "App\ThirdParty\CILogViewer\Views\logs";
+    private $viewName = "logs";
 
     const MAX_LOG_SIZE = 52428800; //50MB
     const MAX_STRING_LENGTH = 300; //300 chars
