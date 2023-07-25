@@ -1,222 +1,108 @@
-CodeIgniter 4 Log Viewer
-=======================
+**CodeIgniter Log Viewer with Composer**
 
-This is a simple Log Viewer for viewing CodeIgniter 4 logs in the browser or via API calls (that returns a JSON response)
-
-This project is a fork of [Codeigniter 3 Log viewer](https://github.com/SeunMatt/codeigniter-log-viewer) by SeunMat
+The `CodeIgniter Log Viewer` package is a convenient library for viewing and managing log files in a CodeIgniter 4 application. It allows users to display logs, download log files, and perform other log-related operations easily.
 
 A typical log view looks like this:
 
 ![sample.png](sample.png)
 
-Usage
-=====
+## Requirements
 
-Requirements
------------
-- PHP >= 7.2
-- Codeigniter 4
+- PHP 7.2 or later
+- CodeIgniter 4
 
-Composer Installation
----------------------
-*not available yet*
+## Installation via Composer
 
-Controller Integration for Browser Display
-------------------------------------------
+You can install the `CodeIgniter Log Viewer` package using Composer, which is the recommended method for managing dependencies in CodeIgniter 4 applications.
 
+1. Require the library via Composer by running the following command in your terminal:
 
-All that is required is to execute the `showLogs()` method in a Controller that is mapped to a route:
+   ```
+   composer require vektormuhammadlutfi/codeigniter-log-viewer:^1.0
+   ```
 
-A typical Controller *(LogViewerController.php)* will have the following content:
+2. Once the package is installed, you can load the `CILogViewer` class in your controller or any other place where you want to use it:
 
-```php
-namespace App\Controllers;
-use CILogViewer\CILogViewer;
+   ```php
+   use \VektorMuhammadLutfi\CodeIgniterLogViewer\CILogViewer;
+   ```
 
-class LogViewerController extends BaseController
-{
-    public function index() {
-        $logViewer = new CILogViewer();
-        return $this->logViewer->showLogs();
-    }
-}
-```
+3. Create a new instance of the `CILogViewer` class:
 
-Then the route `app/Config/Routes.php` can be configured like:
+   ```php
+   $logViewer = new CILogViewer();
+   ```
 
-```php
-$routes->add('logs', "logViewerController::index");
-```
+4. Call the `showLogs` method to display the logs in the log viewer:
 
-And that's all! If you visit `/logs` on your browser 
-you should see all the logs that are in `writable/logs` folder and their content
+   ```php
+   echo $logViewer->showLogs();
+   ```
 
+5. You can customize the behavior and appearance of the log viewer by modifying the configuration variables and view files as required.
 
-Configuration
-==============
+## Usage
 
-Configuration (optional) parameters can be set by adding `$logFolderPath` to a `CILogViewer` class in the CodeIgniter's `Config` folder.
+To use the `CodeIgniter Log Viewer` package in your CodeIgniter 4 application, follow these steps:
 
-- The folder path for log files can be configured with the `$logFolderPath` config var.
+1. Make sure that the Composer autoloader is properly set up in your application. If you don't have an `index.php` file in your public directory, create one and add the following lines:
 
-- The file pattern for matching all the log files in the log folder can be configured by adding `$logFilePattern` config var.
-- The name of the view that renders the logs page can be changed using the  `$viewName` config var. Please note that this can be a route relative to your `View` path or a namespace route.
+   ```php
+   <?php
 
-Example configuration file `app/Config/CILogViewer.php`:
+   require __DIR__.'/../vendor/autoload.php';
 
-```php
-<?php
-namespace Config;
-use CodeIgniter\Config\BaseConfig;
+   // Rest of your CodeIgniter 4 bootstrap code...
+   ```
 
-class CILogViewer extends BaseConfig {
-    public $logFilePattern = 'log-*.php';
-    public $viewName = 'myLogViewer/log'
-}
-```
+2. Load the `CILogViewer` class in your controller or any other place where you want to use it:
 
+   ```php
+   use \VektorMuhammadLutfi\CodeIgniterLogViewer\CILogViewer;
+   ```
 
-Viewing Log Files via API Calls
-===============================
+3. Create a new instance of the `CILogViewer` class:
 
-If you're developing an API Service, powered by CodeIgniter, this library can still be used to view your log files.
+   ```php
+   $logViewer = new CILogViewer();
+   ```
 
-Controller Setup
-----------------
-**The setup is the same as that mentioned above:** 
- - Create a Controller e.g. `ApiLogViewerController.php`, 
- - Create a function e.g. `index()`
- - In the function, call `echo $this->logViewer->showLogs();`
- - Finally, map your controller function to a route.
- 
- API Commands
- ------------
- 
- The API is implemented via a set of query params that can be appended to the `/logs` path.
- 
- Query:
- 
- - `/logs?api=list` will list all the log files available in the configured folder
+4. Call the `showLogs` method to display the logs in the log viewer:
 
-Response:
+   ```php
+   echo $logViewer->showLogs();
+   ```
 
- ```json
-{
-    "status": true,
-    "log_files": [
-        {
-            "file_b64": "bG9nLTIwMTgtMDEtMTkucGhw",
-            "file_name": "log-2018-01-19.php"
-        },
-        {
-            "file_b64": "bG9nLTIwMTgtMDEtMTcucGhw",
-            "file_name": "log-2018-01-17.php"
-        }
-    ]
-}
-```
+5. You can customize the behavior and appearance of the log viewer by modifying the configuration variables and view files as required.
 
-**file_b64 is the base64 encoded name of the file that will be used in further operations and API calls**
- 
- Query:
- 
- - `/logs?api=view&f=bG9nLTIwMTgtMDEtMTcucGhw` will return the logs contained in the log file specified by the `f` parameter. 
- 
- The value of the `f` (*f stands for file*) is the base64 encoded format of the log file name. It is obtained from the `/logs?api=list` API call. 
- A list of all available log files is also returned.
- 
- Response:
- 
- ```json
- {
-     "log_files": [
-         {
-             "file_b64": "bG9nLTIwMTgtMDEtMTkucGhw",
-             "file_name": "log-2018-01-19.php"
-         },
-         {
-             "file_b64": "bG9nLTIwMTgtMDEtMTcucGhw",
-             "file_name": "log-2018-01-17.php"
-         }
-     ],
-     "status": true,
-     "logs": [
-         "ERROR - 2018-01-23 07:12:31 --> 404 Page Not Found: admin/Logs/index",
-         "ERROR - 2018-01-23 07:12:37 --> 404 Page Not Found: admin//index",
-         "ERROR - 2018-01-23 15:23:02 --> 404 Page Not Found: Faviconico/index"
-     ]
- }
- ```
- 
- The API Query can also take one last parameter, `sline` that will determine how the logs are returned
- When it's `true` the logs are returned in a single line:
- 
- Query:
- 
- `/logs?api=view&f=bG9nLTIwMTgtMDEtMTkucGhw&sline=true`
- 
- Response:
- 
- ```json
-{
-    "log_files": [
-        {
-            "file_b64": "bG9nLTIwMTgtMDEtMTkucGhw",
-            "file_name": "log-2018-01-19.php"
-        },
-        {
-            "file_b64": "bG9nLTIwMTgtMDEtMTcucGhw",
-            "file_name": "log-2018-01-17.php"
-        }
-    ],
-    "status": true,
-    "logs": "ERROR - 2018-01-23 07:12:31 --> 404 Page Not Found: admin/Logs/index\r\nERROR - 2018-01-23 07:12:37 --> 404 Page Not Found: admin//index\r\nERROR - 2018-01-23 15:23:02 --> 404 Page Not Found: Faviconico/index\r\n"
-}
-```
- 
- 
- When it's `false` (**Default**), the logs are returned in as an array, where each element is a line in the log file:
+## API Usage
 
-Query:
+The `CodeIgniter Log Viewer` package also provides an API that allows you to programmatically access log files and perform operations.
 
- `/logs?api=view&f=bG9nLTIwMTgtMDEtMTkucGhw&sline=false` OR `logs?api=view&f=bG9nLTIwMTgtMDEtMTkucGhw` 
+1. To retrieve a list of log files, send a GET request to `/logs?api=list`.
 
-Response:
- 
- ```json
-{
-    
-    "logs": [
-        "ERROR - 2018-01-23 07:12:31 --> 404 Page Not Found: admin/Logs/index",
-        "ERROR - 2018-01-23 07:12:37 --> 404 Page Not Found: admin//index",
-        "ERROR - 2018-01-23 15:23:02 --> 404 Page Not Found: Faviconico/index"
-    ]
-}
-```
- 
-Query:
+2. To view the logs of a specific file, send a GET request to `/logs?api=view&f=<file_name>`, where `<file_name>` is the base64-encoded name of the log file.
 
-`/logs?api=delete&f=bG9nLTIwMTgtMDEtMTkucGhw` will delete a single log file. The **f** parameter is the base64 encoded name of the file
-and can be obtained from the view api above.
+3. To delete a log file, send a GET request to `/logs?api=delete&f=<file_name>`, where `<file_name>` is the base64-encoded name of the log file you want to delete. You can also use `&f=all` to delete all log files.
 
-Query: 
+4. Make sure to handle the JSON response from the API and display it appropriately in your application.
 
-`/logs?api=delete&f=all` will delete all log files in the configured folder path. Take note of the value for **f** which is the literal '**all**'.
- 
- **IF A FILE IS TOO LARGE (> 50MB), YOU CAN DOWNLOAD IT WITH THIS API QUERY `/logs?dl=bG9nLTIwMTgtMDEtMTcucGhw`**
- 
- 
-SECURITY NOTE
-=============
-**It is Highly Recommended that you protect/secure the route for your logs. It should not be an open resource!**
+## Contributing
 
+Contributions to this project are highly welcomed! If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
 
-Author
-======
-Codeigniter 4 Log Viewer by Miguel Martinez\
-Based on the Codeigniter 3 version by by [Seun Matt](https://smattme.com)
+## License
 
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-LICENSE
-=======
-[MIT](LICENSE)
+## Credits
+
+- The `CodeIgniter Log Viewer` package is a refactor of the original library by Miguel Martinez. It is further developed and maintained by Muhammad Lutfi.
+
+## Resources
+
+- [CodeIgniter 4 User Guide](https://codeigniter.com/user_guide/index.html)
+
+---
+
+We hope you find the `CodeIgniter Log Viewer` package helpful for accessing and managing log files in your CodeIgniter 4 application. If you have any questions or need further assistance, please don't hesitate to reach out!
