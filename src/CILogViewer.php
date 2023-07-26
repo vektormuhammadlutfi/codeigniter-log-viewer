@@ -241,22 +241,22 @@ class CILogViewer
                 } else {
                     $data["content"] = $logMessage;
                 }
+
+                $data["icon"] = isset(self::$levelsIcon[$data["level"]]) ? self::$levelsIcon[$data["level"]] : '';
+                $data["class"] = isset(self::$levelClasses[$data["level"]]) ? self::$levelClasses[$data["level"]] : '';
+
+                array_push($superLog, $data);
             } elseif (!empty($superLog)) {
                 $prevLog = $superLog[count($superLog) - 1];
                 $extra = array_key_exists("extra", $prevLog) ? $prevLog["extra"] : "";
                 $prevLog["extra"] = $extra . "<br>" . $log;
                 $superLog[count($superLog) - 1] = $prevLog;
             }
-
-            if (!empty($data)) {
-                $data["icon"] = self::$levelsIcon[$data["level"]];
-                $data["class"] = self::$levelClasses[$data["level"]];
-                array_push($superLog, $data);
-            }
         }
 
         return $superLog;
     }
+
 
     /**
      * Extract the log level, log date, and log message from a log line using regex.
